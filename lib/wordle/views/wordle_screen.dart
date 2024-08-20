@@ -1,7 +1,6 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:wordleclone/app/app_colors.dart';
 import 'package:wordleclone/wordle/wordle.dart';
 import 'dart:math';
 import 'package:wordleclone/wordle/data/word_list.dart';
@@ -189,38 +188,60 @@ class _WordleScreenState extends State<WordleScreen> {
   void _checkWinOrLoss() {
     if (_currentWord!.wordString == _solution.wordString) {
       _gameStatus = GameStatus.won;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        dismissDirection: DismissDirection.none,
-        duration: const Duration(days: 1),
-        backgroundColor: correctColor,
-        content: const Text(
-          'You Won!',
-          style: TextStyle(color: Colors.white),
-        ),
-        action: SnackBarAction(
-          onPressed: _restart,
-          textColor: Colors.white,
-          label: 'New Game',
-        ),
-      ));
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              backgroundColor: Colors.grey[900],
+              title: const Text('You Won!'),
+              content:
+                  Text('You guessed the word at your $_currentWordIndex. try!'),
+              actions: [
+                MaterialButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()));
+                  },
+                  child: const Text('Menu'),
+                ),
+                MaterialButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _restart();
+                  },
+                  child: const Text('New Game'),
+                )
+              ],
+            );
+          });
     } else if (_currentWordIndex + 1 >= _board.length) {
-      _gameStatus = GameStatus.lost;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        dismissDirection: DismissDirection.none,
-        duration: const Duration(days: 1),
-        backgroundColor: Colors.redAccent[200],
-        content: Text(
-          'You Lost! Solution: ${_solution.wordString}',
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-        ),
-        action: SnackBarAction(
-          onPressed: _restart,
-          textColor: Colors.white,
-          label: 'New Game',
-        ),
-      ));
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              backgroundColor: Colors.grey[900],
+              title: const Text('You Lost!'),
+              content: Text('Solution: ${_solution.wordString}.'),
+              actions: [
+                MaterialButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()));
+                  },
+                  child: const Text('Menu'),
+                ),
+                MaterialButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _restart();
+                  },
+                  child: const Text('New Game'),
+                )
+              ],
+            );
+          });
     } else {
       _gameStatus = GameStatus.playing;
     }
